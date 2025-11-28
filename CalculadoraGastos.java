@@ -1,79 +1,89 @@
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class CalculadoraGastos {
 
-  //Constantes
-  private static final int MAX_GASTOS = 20;
-  private static final double PRESUPUESTO_INICIAL = 0.0;
+  //Ahora se utiliza ArrayList en vez de arrays
+  private ArrayList<Movimiento> todosLosMovimientos;
+  private HashMap<String, Gasto> gastosMap; //Para buscar rapido
 
-  //Variables globales para guardar los gastos
-  private static String[] descripciones = new String[MAX_GASTOS];
-  private static double[] montos = new double[MAX_GASTOS];
-  private static String[] categorias = new String[MAX_GASTOS];
-  private static int totalGastos = 0;
-  private static double presupuestoActual = PRESUPUESTO_INICIAL;
+  private double presupuesto;
+  private Scanner scanner;
 
+  public CalculadoraGastos() {
+    todosLosMovimientos = new ArrayList<>();
+    gastosMap = new HashMap<>();
+    presupuesto = 0.0;
+    scanner = new Scanner(System.in);
+  }
 
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    int opcion;
-
-    System.out.println("=========================================");
+  public void empezar() {
+    System.out.println("\n=========================================");
     System.out.println("   CALCULADORA DE GASTOS PERSONALES");
     System.out.println("=========================================");
-    System.out.println("Presupuesto inicial: $" + PRESUPUESTO_INICIAL);
+
+    int opcion;
 
     do {
       mostrarMenu();
-      opcion = leerOpcion(scanner);
+      opcion = leerOpcion();
 
-      switch (opcion){
+      switch (opcion) {
         case 1:
-          agregarGasto(scanner);
+          agregarGasto();
           break;
         case 2:
-          verGastos();
+          agregarIngreso();
           break;
         case 3:
-          verPorCategoria(scanner);
+          verTodo();
           break;
         case 4:
-          verResumen();
+          verSoloGastos();
           break;
         case 5:
-          cambiarPresupuesto(scanner);
+          verPorCategoria();
           break;
         case 6:
-          System.out.println("Gracias por usar la calculadora!");
+          buscarGasto();
+          break;
+        case 7:
+          verResumen();
+          break;
+        case 8:
+          System.out.println("\nGracias por usar la calculadora!");
           break;
         default:
           System.out.println("Opcion no valida");
       }
-    } while (opcion != 6);
+    } while (opcion != 8);
 
     scanner.close();
   }
 
-  private static void mostrarMenu() {
-    System.out.println("--- MENU PRINCIPAL ---");
-    System.out.println("1. Agregar un gasto");
-    System.out.println("2. Ver todos mis gastos");
-    System.out.println("3. Ver gastos por categoria");
-    System.out.println("4. Ver resumen");
-    System.out.println("5. Cambiar mi presupuesto");
-    System.out.println("6. Salir");
-    System.out.println("Presupuesto disponible: $" + presupuestoActual);
-    System.out.print("Eligi una opcion: ");
+  private void mostrarMenu() {
+    System.out.println("\n--- MENU PRINCIPAL ---");
+    System.out.println("1. Registrar un gasto");
+    System.out.println("2. Registrar un ingreso");
+    System.out.println("3. Ver todo");
+    System.out.println("4. Ver solo gastos");
+    System.out.println("5. Ver solo por categoria");
+    System.out.println("6. Buscar un gasto");
+    System.out.println("7. Ver resumen");
+    System.out.println("8. Salir");
+    System.out.println("Presupuesto disponible: $" + presupuesto);
+    System.out.print("Elige una opcion: ");
   }
 
-  private static int leerOpcion(Scanner scanner) {
+  private int leerOpcion() {
     int opcion = 0;
 
-    while (opcion < 1 || opcion > 6) {
+    while (opcion < 1 || opcion > 8) {
       if (scanner.hasNextInt()) {
         opcion = scanner.nextInt();
-        if (opcion < 1 || opcion > 6) {
-          System.out.print("Debe ser entre 1 y 6, intenta de nuevo: ");
+        if (opcion < 1 || opcion > 8) {
+          System.out.print("Debe ser entre 1 y 8, intenta de nuevo: ");
         }
       } else {
         System.out.println("Eso no es un numero, intenta de nuevo: ");
@@ -84,16 +94,11 @@ public class CalculadoraGastos {
     return opcion;
   }
 
-  private static void agregarGasto(Scanner scanner) {
-    if(totalGastos >= MAX_GASTOS){
-      System.out.println("Ya llegaste al limite de gastos que puedes registrar");
-      return;
-    }
+  private void agregarGasto() {
+    scanner.nextLine();
 
-    scanner.nextLine(); //Limpiar
-
-    System.out.println("--- AGREGAR GASTO ---");
-    System.out.print("En que gastaste?: ");
+    System.out.println("\n--- AGREGAR GASTO ---");
+    System.out.print("¿Que compraste/pagaste?: ");
     String descripcion = scanner.nextLine();
 
     //Validar que escribio algo
@@ -104,7 +109,7 @@ public class CalculadoraGastos {
 
     //Leer cuanto gasto
     System.out.print("¿Cuanto gastaste? $");
-    double monto = leerMonto(scanner);
+    double monto = leerMonto();
 
     //Elegir categoria
     System.out.println("Categorias:");
@@ -115,7 +120,7 @@ public class CalculadoraGastos {
     System.out.println("5. Otros");
     System.out.print("¿En que categoria va? ");
 
-    int cat = leerCategoriaValida(scanner);
+    int cat = leerCategoriaValida();
     String categoria = "";
 
     if (cat == 1) {
@@ -130,51 +135,155 @@ public class CalculadoraGastos {
       categoria = "Otros";
     }
 
-    //Guardar el gasto
-    descripciones[totalGastos] = descripcion;
-    montos[totalGastos] = monto;
-    categorias[totalGastos] = categoria;
-    totalGastos++;
+    //Creo el objeto Gasto
+    Gasto nuevoGasto = new Gasto(descripcion, monto, categoria);
 
-    presupuestoActual -= monto;
+    //Lo agrego al ArrayList
+    todosLosMovimientos.add(nuevoGasto);
 
-    System.out.println("Listo! Gasto registrado");
+    //Tambien lo agrego al HashMap para buscarlo despues
+    gastosMap.put(descripcion.toLowerCase(), nuevoGasto);
+
+    presupuesto -= monto;
+
+    System.out.println("\nListo! Gasto registrado");
     System.out.println("Gastaste: $" + monto);
-    System.out.println("Te quedan: $" + presupuestoActual);
+    System.out.println("Te quedan: $" + presupuesto);
 
     //Avisar si ya se paso
-    if (presupuestoActual < 0){
-      System.out.println("CUIDADO! Ya te pasaste de tu presupuesto!");
-    } else if (presupuestoActual < PRESUPUESTO_INICIAL * 0.2) {
-      System.out.println("OJO! Ya solo te queda menos del 20% del presupuesto");
+    if (presupuesto < 0) {
+      System.out.println("CUIDADO! Ya te pasaste de tu presupuesto! Estas en Negativo!");
     }
   }
 
-  private static double leerMonto(Scanner scanner) {
-    double monto = -1;
+  private void agregarIngreso() {
+    scanner.nextLine();
 
-    while (monto <= 0){
-      if(scanner.hasNextDouble()){
-        monto = scanner.nextDouble();
-        if (monto <= 0){
-          System.out.println("Debe ser mayor a cero. Intenta de nuevo: $");
-        }
-      } else {
-        System.out.println("Eso no es un numero valido. Intetna de nuevo: $");
-        scanner.next();
+    System.out.println("\n--- AGREGAR INGRESO ---");
+    System.out.print("De donde vino la plata?: ");
+    String descripcion = scanner.nextLine();
+
+    //Validar que escribio algo
+    while (descripcion.trim().isEmpty()) {
+      System.out.println("Necesitas escribir algo: ");
+      descripcion = scanner.nextLine();
+    }
+
+    //Leer cuanto ingreso
+    System.out.print("¿Cuanto ingresaste? $");
+    double monto = leerMonto();
+
+    //Creo el objeto Ingreso
+    Ingreso nuevoIngreso = new Ingreso(descripcion, monto);
+
+    //Lo agrego al ArrayList
+    todosLosMovimientos.add(nuevoIngreso);
+
+    presupuesto += monto;
+
+    System.out.println("\nListo! Ingreso registrado");
+    System.out.println("Ingresaste: $" + monto);
+    System.out.println("Ahora tenes: $" + presupuesto);
+  }
+
+  private void verTodo() {
+    System.out.println("\n--- TODOS LOS MOVIMIENTOS ---");
+
+    if (todosLosMovimientos.isEmpty()) {
+      System.out.println("No hay nada registrado todavia");
+      return;
+    }
+
+    //Aca aparece el polimorfismo: cada uno se muestra diferente
+    for (Movimiento m : todosLosMovimientos) {
+      m.mostrar();
+    }
+
+    System.out.println("\nTotal: " + todosLosMovimientos.size() + " movimientos");
+  }
+
+  private void verSoloGastos() {
+    System.out.println("\n--- MIS GASTOS ---");
+
+    int contador = 0;
+
+    //Filtro solo los gastos usando instanceof
+    for (Movimiento m : todosLosMovimientos) {
+      if (m instanceof Gasto) {
+        m.mostrar();
+        contador++;
       }
     }
 
-    return monto;
+    if (contador == 0) {
+      System.out.println("No hay gastos todavia");
+    } else {
+      System.out.println("\nTotal: " + contador + " gastos");
+    }
   }
 
-  private static int leerCategoriaValida(Scanner scanner) {
+  private void verPorCategoria() {
+    if (todosLosMovimientos.isEmpty()) {
+      System.out.println("Todavia no has registrado gastos");
+      return;
+    }
+
+    System.out.println("\n--- VER POR CATEGORIA --- :");
+    System.out.println("1. Comida");
+    System.out.println("2. Transporte");
+    System.out.println("3. Entretenimiento");
+    System.out.println("4. Salud");
+    System.out.println("5. Otros");
+    System.out.print("¿Que categoria queres ver? ");
+
+    int cat = leerCategoriaValida();
+    String categoriaElegida = "";
+
+    if (cat == 1) {
+      categoriaElegida = "Comida";
+    } else if (cat == 2) {
+      categoriaElegida = "Transporte";
+    } else if (cat == 3) {
+      categoriaElegida = "Entretenimiento";
+    } else if (cat == 4) {
+      categoriaElegida = "Salud";
+    } else {
+      categoriaElegida = "Otros";
+    }
+
+    System.out.println("\nGastos en: " + categoriaElegida);
+
+    double totalCat = 0;
+    int contador = 0;
+
+    for (Movimiento m : todosLosMovimientos) {
+      if (m instanceof Gasto) {
+        Gasto g = (Gasto) m;
+        if (g.getCategoria().equals(categoriaElegida)) {
+          contador++;
+          System.out.println(contador + ". " + g.getDescripcion() + " - $" + g.getMonto());
+          totalCat += g.getMonto();
+        }
+      }
+    }
+
+    if (contador == 0) {
+      System.out.println("No tienes gastos en esta categoria");
+    } else {
+      System.out.println("\nTotal en " + categoriaElegida + ": $" + totalCat);
+      String texto = (contador == 1) ? " gasto" : " gastos";
+      System.out.println("Tienes " + contador + texto + " en esta categoria");
+    }
+
+  }
+
+  private int leerCategoriaValida() {
     int opcion = 0;
 
-    while (opcion < 1 || opcion > 5){
-      if (scanner.hasNextInt()){
+    while (opcion < 1 || opcion > 5) {
+      if (scanner.hasNextInt()) {
         opcion = scanner.nextInt();
-        if (opcion < 1 || opcion > 5){
+        if (opcion < 1 || opcion > 5) {
           System.out.println("Debe ser entre 1 y 5: ");
         }
       } else {
@@ -186,149 +295,110 @@ public class CalculadoraGastos {
     return opcion;
   }
 
+  private void buscarGasto() {
+    scanner.nextLine();
 
-  private static void verGastos() {
-    System.out.println("--- MIS GASTOS ---");
+    System.out.println("\n--- BUSCAR GASTO ---");
+    System.out.print("Que gasto queres buscar?: ");
+    String buscar = scanner.nextLine().toLowerCase();
 
-    if (totalGastos == 0) {
-      System.out.println("Todavia no has registrado ningun gasto");
-      return;
-    }
+    //Aca uso el HashMap para buscar rapido
+    Gasto encontrado = gastosMap.get(buscar);
 
-    for (int i = 0; i < totalGastos; i++){
-      System.out.println((i + 1) + ". " + descripciones[i] + " - $" + montos[i] + " (" + categorias[i] + ")");
-    }
-  }
-
-  private static void verPorCategoria(Scanner scanner) {
-    if (totalGastos == 0) {
-      System.out.println("Todavia no has registrado gastos");
-      return;
-    }
-
-    System.out.println("--- VER POR CATEGORIA --- :");
-    System.out.println("1. Comida");
-    System.out.println("2. Transporte");
-    System.out.println("3. Entretenimiento");
-    System.out.println("4. Salud");
-    System.out.println("5. Otros");
-    System.out.print("¿Que categoria queres ver? ");
-
-    int cat = leerCategoriaValida(scanner);
-    String categoriaElegida = "";
-
-    if (cat == 1) categoriaElegida = "Comida";
-    if (cat == 2) categoriaElegida = "Transporte";
-    if (cat == 3) categoriaElegida = "Entretenimiento";
-    if (cat == 4) categoriaElegida = "Salud";
-    else categoriaElegida = "Otros";
-
-    System.out.println("\nGastos en: " + categoriaElegida);
-
-    double totalCat = 0;
-    int contador = 0;
-
-    for (int i = 0; i < totalGastos; i++){
-      if (categorias[i].equals(categoriaElegida)){
-        contador++;
-        System.out.println((i + 1) + ". " + descripciones[i] + " - $" + montos[i] + " (" + categorias[i] + ")");
-        totalCat += montos[i];
-      }
-    }
-
-    if (contador == 0){
-      System.out.println("No tienes gastos en esta categoria");
+    if (encontrado != null) {
+      System.out.println("\nEncontrado:");
+      encontrado.mostrar();
     } else {
-      System.out.println("\nTotal en " + categoriaElegida + ": $" + totalCat);
-      String texto = (contador == 1) ? " gasto" : " gastos";
-      System.out.println("Tienes " + contador + texto + " en esta categoria");
+      System.out.println("No encontre ese gasto");
     }
-
   }
 
-  private static void verResumen() {
-    System.out.println("==========================================");
+  private void verResumen() {
+    System.out.println("\n==========================================");
     System.out.println("           RESUMEN FINANCIERO             ");
     System.out.println("==========================================");
 
-    if (totalGastos == 0) {
+    if (todosLosMovimientos.isEmpty()) {
       System.out.println("No hay gastos para mostrar");
       return;
     }
 
     //Calcular todo
-    double totalGastado = 0;
-    double mayor = montos[0];
-    double menor = montos[0];
+    double totalGastos = 0;
+    double totalIngresos = 0;
+    int cantGastos = 0;
+    int cantIngresos = 0;
 
-    for(int i = 0; i < totalGastos; i++){
-      totalGastado += montos[i];
-
-      if (montos[i] > mayor){
-        mayor = montos[i];
-      }
-
-      if (montos[i] < menor){
-        menor = montos[i];
+    //Separo gastos de ingresos
+    for (Movimiento m : todosLosMovimientos) {
+      if (m instanceof Gasto) {
+        totalGastos += m.getMonto();
+        cantGastos++;
+      } else if (m instanceof Ingreso) {
+        totalIngresos += m.getMonto();
+        cantIngresos++;
       }
     }
 
-    double promedio = totalGastado / totalGastos;
-    double porcentaje = (totalGastado / PRESUPUESTO_INICIAL) * 100;
+    System.out.println("\nIngresos: $" + totalIngresos + " (" + cantIngresos + ")");
+    System.out.println("Gastos: $" + totalGastos + " (" + cantGastos + ") ");
+    System.out.println("Balance: $" + (totalIngresos - totalGastos));
+    System.out.println("Disponible ahora: $" + presupuesto);
 
-    System.out.println("Total gastado: $" + totalGastado);
-    System.out.println("Presupuesto inicial: $" + PRESUPUESTO_INICIAL);
-    System.out.println("Te queda: $" + presupuestoActual);
-    System.out.println("Porcentaje gastado: " + porcentaje + "%");
-    System.out.println("Promedio por gasto: $" + promedio);
-    System.out.println("Tu gasto mas alto: $" + mayor);
-    System.out.println("Tu gasto mas bajo: $" + menor);
-    System.out.println("Numero de gastos: " + totalGastos);
-    
+    if (cantGastos > 0) {
+      double promedio = totalGastos / cantGastos;
+      System.out.println("Promedio por gasto: $" + promedio);
+    }
+
     //Mostrar por categoria
     System.out.println("Por categoria: ");
     mostrarTotalesPorCategoria();
   }
 
-  private static void mostrarTotalesPorCategoria() {
-    String[] cats = {"Comida", "Transporte", "Entretenimiento", "Salud", "Otros"};
+  private void mostrarTotalesPorCategoria() {
+    String[] categorias = {"Comida", "Transporte", "Entretenimiento", "Salud", "Otros"};
 
-    for (int c = 0; c < cats.length; c++) {
+    for (String cat : categorias) {
       double totalCat = 0;
       int cantidad = 0;
 
-      for (int i = 0; i < totalGastos; i++) {
-        if(categorias[i].equals(cats[c])) {
-          totalCat += montos[i];
-          cantidad++;
+      for (Movimiento m : todosLosMovimientos) {
+        if (m instanceof Gasto) {
+          Gasto g = (Gasto) m;
+          if (g.getCategoria().equals(cat)) {
+            totalCat += g.getMonto();
+            cantidad++;
+          }
         }
       }
 
       if (cantidad > 0) {
         String texto = (cantidad == 1) ? " gasto" : " gastos";
-        System.out.println(" " + cats[c] + ": $" + totalCat + " (" + cantidad + texto + ")");
+        System.out.println(" " + cat + ": $" + totalCat + " (" + cantidad + texto + ")");
       }
     }
   }
 
-  private static void cambiarPresupuesto(Scanner scanner) {
-    System.out.println("--- AGREGAR PRESUPUESTO ---");
-    System.out.println("Presupuesto actual: $" + presupuestoActual);
-    System.out.print("¿Cual sera tu nuevo presupuesto? $");
+  private double leerMonto() {
+    double monto = -1;
 
-    double nuevo = leerMonto(scanner);
-    double diferencia = nuevo - presupuestoActual;
-    presupuestoActual = nuevo;
-
-    System.out.println("Listo! Tu nuevo presupuesto es: $" + presupuestoActual);
-
-    if (diferencia > 0) {
-      System.out.println("Aumentaste tu presupuesto en $" + diferencia);
-    } else if (diferencia < 0) {
-      System.out.println("Redujiste tu presupuesto en $" + (diferencia * -1 ));
-    } else {
-      System.out.println("El presupuesto quedo igual");
+    while (monto <= 0) {
+      if (scanner.hasNextDouble()) {
+        monto = scanner.nextDouble();
+        if (monto <= 0) {
+          System.out.println("Debe ser mayor a cero. Intenta de nuevo: $");
+        }
+      } else {
+        System.out.println("Eso no es un numero valido. Intetna de nuevo: $");
+        scanner.next();
+      }
     }
+
+    return monto;
   }
 
+  public static void main(String[] args) {
+    CalculadoraGastos calculadoraGastos = new CalculadoraGastos();
+    calculadoraGastos.empezar();
+  }
 }

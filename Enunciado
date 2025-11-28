@@ -1,9 +1,8 @@
 Calculadora de Gastos Personales
 
-Aplicar conceptos del Módulo 1:
-    - Variables y tipos de datos
-    - Operadores
-    - Control de flujo (if, switch, loops)
-    - Métodos y scope
-    - Validaciones con Scanner
-    - Buenas prácticas y convenciones
+Aplicar conceptos del Módulo 2:
+    - Desacoplamos código
+    - Movimiento.java → nuestra clase abstracta base
+    - Gasto.java → hereda de Movimiento y agrega categoría
+    - Ingreso.java → también hereda pero es más simple
+    - CalculadoraGastos.java → toda la lógica del menú

@@ -1,3 +1,7 @@
+import model.Gasto;
+import model.Ingreso;
+import model.Movimiento;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;

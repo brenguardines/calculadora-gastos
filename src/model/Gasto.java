@@ -1,3 +1,5 @@
+package model;
+
 public class Gasto extends Movimiento {
   private String categoria;
 
@@ -8,7 +10,7 @@ public class Gasto extends Movimiento {
 
   @Override
   public void mostrar() {
-    System.out.println(" - " + descripcion + ": $" + monto + " (" + categoria + ")");
+    System.out.println(" - " + descripcion + ": $" + monto + " (" + categoria + ") [" + getFechaFormateada() + "]");
   }
 
   public String getCategoria() {

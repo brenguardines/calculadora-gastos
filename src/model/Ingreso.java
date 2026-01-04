@@ -1,3 +1,5 @@
+package model;
+
 public class Ingreso extends Movimiento {
   public Ingreso(String descripcion, double monto) {
     super(descripcion, monto);
@@ -5,6 +7,6 @@ public class Ingreso extends Movimiento {
 
   @Override
   public void mostrar() {
-    System.out.println(" + " + descripcion + ": $" + monto);
+    System.out.println(" + " + descripcion + ": $" + monto + " [" + getFechaFormateada() + "]");
   }
 }

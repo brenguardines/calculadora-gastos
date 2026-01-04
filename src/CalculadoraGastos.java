@@ -1,3 +1,4 @@
+import exceptions.PresupuestoInsuficienteException;
 import model.Gasto;
 import model.Ingreso;
 import model.Movimiento;
@@ -33,33 +34,39 @@ public class CalculadoraGastos {
       mostrarMenu();
       opcion = leerOpcion();
 
-      switch (opcion) {
-        case 1:
-          agregarGasto();
-          break;
-        case 2:
-          agregarIngreso();
-          break;
-        case 3:
-          verTodo();
-          break;
-        case 4:
-          verSoloGastos();
-          break;
-        case 5:
-          verPorCategoria();
-          break;
-        case 6:
-          buscarGasto();
-          break;
-        case 7:
-          verResumen();
-          break;
-        case 8:
-          System.out.println("\nGracias por usar la calculadora!");
-          break;
-        default:
-          System.out.println("Opcion no valida");
+      //Try-catch para manejar errores
+      try {
+        switch (opcion) {
+          case 1:
+            agregarGasto();
+            break;
+          case 2:
+            agregarIngreso();
+            break;
+          case 3:
+            verTodo();
+            break;
+          case 4:
+            verSoloGastos();
+            break;
+          case 5:
+            verPorCategoria();
+            break;
+          case 6:
+            buscarGasto();
+            break;
+          case 7:
+            verResumen();
+            break;
+          case 8:
+            System.out.println("\nGracias por usar la calculadora!");
+            break;
+          default:
+            System.out.println("Opcion no valida");
+        }
+      } catch (PresupuestoInsuficienteException e) {
+        //Manejo de exception
+        System.out.println("ERROR: " + e.getMessage());
       }
     } while (opcion != 8);
 
@@ -98,7 +105,7 @@ public class CalculadoraGastos {
     return opcion;
   }
 
-  private void agregarGasto() {
+  private void agregarGasto() throws PresupuestoInsuficienteException{
     scanner.nextLine();
 
     System.out.println("\n--- AGREGAR GASTO ---");
@@ -114,6 +121,11 @@ public class CalculadoraGastos {
     //Leer cuanto gasto
     System.out.print("¿Cuanto gastaste? $");
     double monto = leerMonto();
+
+    //EXCEPTION validar presupuesto antes de agregar
+    if (monto > presupuesto) {
+      throw new PresupuestoInsuficienteException(monto - presupuesto);
+    }
 
     //Elegir categoria
     System.out.println("Categorias:");

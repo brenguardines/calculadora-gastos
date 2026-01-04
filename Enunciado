@@ -1,8 +1,8 @@
 Calculadora de Gastos Personales
 
-Aplicar conceptos del Módulo 2:
-    - Desacoplamos código
-    - Movimiento.java → nuestra clase abstracta base
-    - Gasto.java → hereda de Movimiento y agrega categoría
-    - Ingreso.java → también hereda pero es más simple
-    - CalculadoraGastos.java → toda la lógica del menú
+Aplicar conceptos del Módulo 3:
+    - Uso de collections para almacenar movimientos
+    - PresupuestoInsuficienteException → excepción personalizada
+    - Separación en packages (model, exceptions)
+    - Manejo de errores con try / catch
+    - Conceptos de Memory Management y Garbage Collection

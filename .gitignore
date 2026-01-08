@@ -27,5 +27,12 @@ replay_pid*
 .idea/
 *.iml
 
+# Maven
+target/
+
 # Carpeta de salida de compilación
 out/
+
+# SO
+.DS_Store
+Thumbs.db

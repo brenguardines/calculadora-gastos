@@ -1,4 +1,4 @@
-package exceptions;
+package com.brenguardines.exceptions;
 
 public class PresupuestoInsuficienteException extends Exception {
   private double faltante;

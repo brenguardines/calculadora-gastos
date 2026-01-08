@@ -1,4 +1,4 @@
-package model;
+package com.brenguardines.model;
 
 public class Ingreso extends Movimiento {
   public Ingreso(String descripcion, double monto) {

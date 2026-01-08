@@ -1,7 +1,9 @@
-import exceptions.PresupuestoInsuficienteException;
-import model.Gasto;
-import model.Ingreso;
-import model.Movimiento;
+package com.brenguardines;
+
+import com.brenguardines.exceptions.PresupuestoInsuficienteException;
+import com.brenguardines.model.Gasto;
+import com.brenguardines.model.Ingreso;
+import com.brenguardines.model.Movimiento;
 
 import java.util.ArrayList;
 import java.util.HashMap;

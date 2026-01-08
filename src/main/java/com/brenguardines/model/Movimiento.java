@@ -1,4 +1,4 @@
-package model;
+package com.brenguardines.model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

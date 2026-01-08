@@ -1,4 +1,4 @@
-package model;
+package com.brenguardines.model;
 
 public class Gasto extends Movimiento {
   private String categoria;

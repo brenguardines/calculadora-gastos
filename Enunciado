@@ -1,8 +1,9 @@
 Calculadora de Gastos Personales
 
-Aplicar conceptos del Módulo 3:
-    - Uso de collections para almacenar movimientos
-    - PresupuestoInsuficienteException → excepción personalizada
-    - Separación en packages (model, exceptions)
-    - Manejo de errores con try / catch
-    - Conceptos de Memory Management y Garbage Collection
+Aplicar conceptos del Módulo 4:
+    - Incorporar Maven al proyecto (pom.xml)
+    - Estructura estándar de proyecto: src/main/java
+    - Organización por paquetes (com.brenguardines, model, exceptions)
+    - Configuración de compilación con Java 21
+    - Ejecución del proyecto con Maven: mvn exec:java
+    - Empaquetado en JAR ejecutable: mvn clean package + java -jar target/...jar
